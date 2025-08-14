@@ -184,8 +184,3 @@ neo4j/
 secrets/
 *.key
 *.pem
-
-# Claude files
-.claude/
-CLAUDE.md
-claude.json
