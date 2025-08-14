@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KB Fortress AI - 기업 리포트 이력</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .search-section {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .search-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1em;
+        }
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .company-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        .report-section {
+            margin-bottom: 30px;
+        }
+        .report-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        .report-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .report-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .report-type {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        .report-type.initial {
+            background: #d4edda;
+            color: #155724;
+        }
+        .report-type.alert {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .report-date {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .report-details {
+            color: #555;
+            line-height: 1.6;
+        }
+        .risk-level {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            margin-left: 10px;
+        }
+        .risk-level.HIGH {
+            background: #e74c3c;
+            color: white;
+        }
+        .risk-level.MEDIUM {
+            background: #f39c12;
+            color: white;
+        }
+        .risk-level.LOW {
+            background: #27ae60;
+            color: white;
+        }
+        .view-report-btn {
+            margin-top: 10px;
+            padding: 8px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95em;
+        }
+        .view-report-btn:hover {
+            background: #764ba2;
+        }
+        .unread-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        .no-reports {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-card h4 {
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 기업 리포트 이력 조회</h1>
+            <p>KB Fortress AI 분석 리포트 및 알림 이력</p>
+        </div>
+        
+        <div class="search-section">
+            <input type="text" id="companyNameInput" class="search-input" placeholder="기업명을 입력하세요 (예: 대한정밀)">
+            <button class="btn" onclick="searchReports()">🔍 조회</button>
+            <button class="btn" onclick="window.location.href='/dashboard'">📊 대시보드</button>
+        </div>
+        
+        <div class="company-info" id="companyInfo">
+            <h2 id="companyTitle"></h2>
+            <div class="stats-grid" id="statsGrid">
+                <!-- 동적으로 추가됨 -->
+            </div>
+        </div>
+        
+        <div id="reportsContainer">
+            <!-- 리포트가 동적으로 추가됨 -->
+        </div>
+        
+        <div class="no-reports" id="noReports">
+            기업명을 입력하고 조회 버튼을 클릭하세요.
+        </div>
+    </div>
+
+    <script>
+        function searchReports() {
+            const companyName = document.getElementById('companyNameInput').value.trim();
+            
+            if (!companyName) {
+                alert('기업명을 입력해주세요.');
+                return;
+            }
+            
+            document.getElementById('noReports').innerHTML = '🔄 리포트를 조회하는 중...';
+            document.getElementById('companyInfo').style.display = 'none';
+            document.getElementById('reportsContainer').innerHTML = '';
+            
+            fetch(`/api/company_report_history/${encodeURIComponent(companyName)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('noReports').innerHTML = `❌ 조회 실패: ${data.error}`;
+                        return;
+                    }
+                    
+                    displayReports(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('noReports').innerHTML = `❌ 조회 중 오류가 발생했습니다: ${error}`;
+                });
+        }
+        
+        function displayReports(data) {
+            const companyInfo = document.getElementById('companyInfo');
+            const reportsContainer = document.getElementById('reportsContainer');
+            const noReports = document.getElementById('noReports');
+            
+            // 기업 정보 표시
+            document.getElementById('companyTitle').textContent = data.company_name;
+            
+            // 통계 표시
+            const unreadCount = data.alert_reports.filter(r => !r.isRead).length;
+            const statsHTML = `
+                <div class="stat-card">
+                    <h4>총 리포트</h4>
+                    <div class="value">${data.total_reports}</div>
+                </div>
+                <div class="stat-card">
+                    <h4>초기 분석</h4>
+                    <div class="value">${data.initial_reports.length}</div>
+                </div>
+                <div class="stat-card">
+                    <h4>리스크 알림</h4>
+                    <div class="value">${data.alert_reports.length}</div>
+                </div>
+                <div class="stat-card">
+                    <h4>읽지 않은 알림</h4>
+                    <div class="value">${unreadCount}</div>
+                </div>
+            `;
+            document.getElementById('statsGrid').innerHTML = statsHTML;
+            companyInfo.style.display = 'block';
+            
+            // 리포트 표시
+            let html = '';
+            
+            // 초기 분석 리포트
+            if (data.initial_reports.length > 0) {
+                html += '<div class="report-section">';
+                html += '<h3>📋 초기 분석 리포트</h3>';
+                
+                data.initial_reports.forEach(report => {
+                    const date = new Date(report.generatedAt).toLocaleString('ko-KR');
+                    const riskClass = report.riskLevel || 'MEDIUM';
+                    
+                    html += `
+                        <div class="report-card">
+                            <div class="report-header">
+                                <div>
+                                    <span class="report-type initial">초기 분석</span>
+                                    <span class="risk-level ${riskClass}">${riskClass}</span>
+                                </div>
+                                <span class="report-date">${date}</span>
+                            </div>
+                            <div class="report-details">
+                                <p><strong>리포트 ID:</strong> ${report.reportId}</p>
+                                <p><strong>조회 횟수:</strong> ${report.accessCount || 0}회</p>
+                                ${report.reportPath ? `<button class="view-report-btn" onclick="window.open('/reports/${report.reportPath.split('/').pop()}', '_blank')">📄 리포트 보기</button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+            }
+            
+            // 알림 리포트
+            if (data.alert_reports.length > 0) {
+                html += '<div class="report-section">';
+                html += '<h3>🚨 리스크 알림 리포트</h3>';
+                
+                data.alert_reports.forEach(report => {
+                    const date = new Date(report.generatedAt).toLocaleString('ko-KR');
+                    const severityClass = report.severity || 'MEDIUM';
+                    
+                    html += `
+                        <div class="report-card">
+                            <div class="report-header">
+                                <div>
+                                    <span class="report-type alert">리스크 알림</span>
+                                    <span class="risk-level ${severityClass}">${severityClass}</span>
+                                    ${!report.isRead ? '<span class="unread-badge">NEW</span>' : ''}
+                                </div>
+                                <span class="report-date">${date}</span>
+                            </div>
+                            <div class="report-details">
+                                <p><strong>알림 ID:</strong> ${report.alertId}</p>
+                                <p><strong>트리거:</strong> ${report.triggeredBy || '알 수 없음'}</p>
+                                <p><strong>긴급도:</strong> ${report.urgency || 'MEDIUM'}</p>
+                                ${report.reportPath ? `<button class="view-report-btn" onclick="viewAndMarkRead('${data.company_name}', '${report.alertId}', '/reports/${report.reportPath.split('/').pop()}')">📄 리포트 보기</button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+            }
+            
+            if (data.total_reports === 0) {
+                noReports.innerHTML = '이 기업에 대한 리포트가 없습니다.';
+                noReports.style.display = 'block';
+            } else {
+                noReports.style.display = 'none';
+                reportsContainer.innerHTML = html;
+            }
+        }
+        
+        function viewAndMarkRead(companyName, alertId, reportUrl) {
+            // 알림을 읽음으로 표시
+            fetch('/api/mark_alert_read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    company_name: companyName,
+                    alert_id: alertId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('알림을 읽음으로 표시했습니다.');
+                    // 페이지 새로고침
+                    searchReports();
+                }
+            })
+            .catch(error => {
+                console.error('Error marking alert as read:', error);
+            });
+            
+            // 리포트 열기
+            window.open(reportUrl, '_blank');
+        }
+        
+        // Enter 키로 검색
+        document.getElementById('companyNameInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                searchReports();
+            }
+        });
+    </script>
+</body>
+</html>

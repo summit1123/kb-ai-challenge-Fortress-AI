@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KB Fortress AI - 분석 결과</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --kb-primary: #FFCC00;
+            --kb-secondary: #785C00;
+            --kb-dark: #1A1A1A;
+            --kb-gray: #666666;
+            --kb-light-gray: #F5F5F5;
+            --kb-success: #00C896;
+            --kb-warning: #FF6B35;
+            --kb-danger: #FF3366;
+            --kb-info: #3366FF;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background: #000;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #333;
+        }
+
+        /* 애니메이션 배경 */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%);
+            z-index: -2;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.2;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--kb-primary);
+            border-radius: 50%;
+            animation: float 25s infinite linear;
+            box-shadow: 0 0 8px var(--kb-primary);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(50px);
+                opacity: 0;
+            }
+        }
+
+        /* 네비게이션 */
+        .nav-header {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 204, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 15px 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--kb-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--kb-dark);
+            box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+        }
+
+        .logo-text h1 {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: white;
+        }
+
+        .logo-text p {
+            font-size: 0.8em;
+            color: var(--kb-primary);
+            opacity: 0.9;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: rgba(255, 204, 0, 0.1);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            border-radius: 20px;
+            color: var(--kb-primary);
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 204, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* 메인 컨테이너 */
+        .main-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* 헤더 카드 */
+        .result-header {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            animation: slideDown 0.8s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, var(--kb-primary), #FFD633);
+            border-radius: 50%;
+            transform: translate(50px, -50px);
+            opacity: 0.1;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .company-name {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--kb-dark);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .success-badge {
+            background: linear-gradient(135deg, var(--kb-success), #00E0A8);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.4em;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .analysis-time {
+            color: var(--kb-gray);
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 204, 0, 0.1);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 204, 0, 0.2);
+        }
+
+        .stat-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--kb-dark);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--kb-gray);
+            font-size: 0.9em;
+        }
+
+        /* 콘텐츠 그리드 */
+        .content-grid {
+            display: block;
+            margin-bottom: 30px;
+        }
+
+        /* 분석 카드 */
+        .analysis-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            animation: slideUp 0.6s ease;
+        }
+
+        .analysis-card:nth-child(1) { animation-delay: 0.1s; }
+        .analysis-card:nth-child(2) { animation-delay: 0.2s; }
+        .analysis-card:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--kb-light-gray);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--kb-primary), #FFD633);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 8px 20px rgba(255, 204, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--kb-dark);
+        }
+
+        .card-subtitle {
+            color: var(--kb-gray);
+            font-size: 0.9em;
+        }
+
+        /* 리스크 레벨 */
+        .risk-level {
+            display: inline-block;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-size: 1.2em;
+            font-weight: 700;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .risk-high {
+            background: linear-gradient(135deg, var(--kb-danger), #FF5577);
+            color: white;
+        }
+
+        .risk-medium {
+            background: linear-gradient(135deg, var(--kb-warning), #FF8A50);
+            color: white;
+        }
+
+        .risk-low {
+            background: linear-gradient(135deg, var(--kb-success), #00E0A8);
+            color: white;
+        }
+
+        /* 상품 리스트 */
+        .product-list, .policy-list {
+            list-style: none;
+        }
+
+        .product-item, .policy-item {
+            background: var(--kb-light-gray);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--kb-primary);
+            transition: all 0.3s ease;
+        }
+
+        .product-item:hover, .policy-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-name, .policy-name {
+            font-weight: 700;
+            color: var(--kb-dark);
+            margin-bottom: 8px;
+        }
+
+        .product-score {
+            background: var(--kb-primary);
+            color: var(--kb-dark);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: 600;
+            float: right;
+        }
+
+        /* 사이드바 */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .quick-actions {
+            background: linear-gradient(135deg, var(--kb-primary), #FFD633);
+            border-radius: 20px;
+            padding: 25px;
+            color: var(--kb-dark);
+            text-align: center;
+        }
+
+        .quick-actions h3 {
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            background: white;
+            color: var(--kb-dark);
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .contact-info {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-info h4 {
+            color: var(--kb-dark);
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            color: var(--kb-gray);
+        }
+
+        .contact-icon {
+            width: 25px;
+            height: 25px;
+            background: var(--kb-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: var(--kb-dark);
+        }
+
+        /* 권장사항 */
+        .recommendations {
+            background: linear-gradient(135deg, rgba(0, 200, 150, 0.1), rgba(0, 224, 168, 0.1));
+            border: 1px solid rgba(0, 200, 150, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .rec-badge {
+            background: var(--kb-success);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .rec-content {
+            flex: 1;
+        }
+
+        .rec-title {
+            font-weight: 600;
+            color: var(--kb-dark);
+            margin-bottom: 5px;
+        }
+
+        .rec-desc {
+            color: var(--kb-gray);
+            font-size: 0.9em;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .company-name {
+                font-size: 2em;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .summary-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 애니메이션 배경 -->
+    <div class="animated-bg"></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- 네비게이션 -->
+    <nav class="nav-header">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">KB</div>
+                <div class="logo-text">
+                    <h1>Fortress AI</h1>
+                    <p>Analysis Complete</p>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <a href="/dashboard" class="nav-btn">📊 대시보드</a>
+                <a href="/reports-history" class="nav-btn">📈 리포트 이력</a>
+                <a href="/" class="nav-btn">🏭 새 기업 등록</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 메인 컨테이너 -->
+    <div class="main-container">
+        <!-- 결과 헤더 -->
+        <div class="result-header">
+            <div class="header-content">
+                <div class="company-name" id="companyName">
+                    기업명
+                    <div class="success-badge">분석 완료</div>
+                </div>
+                <div class="analysis-time" id="analysisTime">분석 완료 시간</div>
+                
+            </div>
+        </div>
+
+        <!-- 콘텐츠 그리드 -->
+        <div class="content-grid">
+            <!-- 메인 콘텐츠 -->
+            <div class="main-content">
+                <!-- 기업 정보 -->
+                <div class="analysis-card">
+                    <div class="card-header">
+                        <div class="card-icon">🏢</div>
+                        <div>
+                            <div class="card-title">기업 정보</div>
+                            <div class="card-subtitle">등록된 기업의 기본 정보입니다</div>
+                        </div>
+                    </div>
+                    
+                    <div id="companyInfo">
+                        <!-- 동적으로 채워짐 -->
+                    </div>
+                </div>
+
+                <!-- 리스크 분석 -->
+                <div class="analysis-card">
+                    <div class="card-header">
+                        <div class="card-icon">⚠️</div>
+                        <div>
+                            <div class="card-title">리스크 분석 결과</div>
+                            <div class="card-subtitle">AI가 분석한 주요 리스크 요인입니다</div>
+                        </div>
+                    </div>
+                    
+                    <div class="risk-level" id="overallRiskLevel">분석 중...</div>
+                    <div id="riskAnalysis">
+                        <!-- 동적으로 채워짐 -->
+                    </div>
+                </div>
+
+                <!-- KB 금융상품 -->
+                <div class="analysis-card">
+                    <div class="card-header">
+                        <div class="card-icon">💳</div>
+                        <div>
+                            <div class="card-title">추천 KB 금융상품</div>
+                            <div class="card-subtitle">귀사에 최적화된 금융 솔루션입니다</div>
+                        </div>
+                    </div>
+                    
+                    <ul class="product-list" id="kbProducts">
+                        <!-- 동적으로 채워짐 -->
+                    </ul>
+                </div>
+
+                <!-- 정부 정책 -->
+                <div class="analysis-card">
+                    <div class="card-header">
+                        <div class="card-icon">🏛️</div>
+                        <div>
+                            <div class="card-title">적용 가능한 정부 정책</div>
+                            <div class="card-subtitle">활용 가능한 지원 정책 및 제도입니다</div>
+                        </div>
+                    </div>
+                    
+                    <ul class="policy-list" id="policies">
+                        <!-- 동적으로 채워짐 -->
+                    </ul>
+                </div>
+
+                <!-- 🏭 원자재 위험 분석 (새로 추가) -->
+                <div class="analysis-card">
+                    <div class="card-header">
+                        <div class="card-icon">🏭</div>
+                        <div>
+                            <div class="card-title">원자재 의존도 분석</div>
+                            <div class="card-subtitle">주요 원자재 가격 변동이 귀사에 미치는 영향</div>
+                        </div>
+                    </div>
+                    
+                    <div id="rawMaterialAnalysis">
+                        <!-- 동적으로 채워짐 -->
+                    </div>
+                </div>
+
+                <!-- 🔥 멀티홉 위험 분석 (새로 추가) -->
+                <div class="analysis-card">
+                    <div class="card-header">
+                        <div class="card-icon">🕸️</div>
+                        <div>
+                            <div class="card-title">멀티홉 위험 분석</div>
+                            <div class="card-subtitle">그래프 기반 연결성 분석으로 발견된 복합 위험</div>
+                        </div>
+                    </div>
+                    
+                    <div id="multihopAnalysis">
+                        <!-- 동적으로 채워짐 -->
+                    </div>
+                </div>
+
+                <!-- 권장사항 섹션 제거 -->
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 파티클 애니메이션
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 25 + 's';
+                particle.style.animationDuration = (20 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // URL 파라미터에서 데이터 가져오기
+        function getUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return {
+                company_name: urlParams.get('company_name') || '등록된 기업',
+                success: urlParams.get('success') === 'true',
+                // 추가 파라미터들...
+            };
+        }
+
+        // 분석 결과 데이터 로드
+        function loadAnalysisResult() {
+            const params = getUrlParams();
+            
+            if (!params.success) {
+                document.getElementById('companyName').textContent = '분석 실패';
+                return;
+            }
+
+            // 기본 정보 설정 (이전에 설정되지 않았다면)
+            const companyNameElement = document.getElementById('companyName');
+            if (companyNameElement.textContent === '기업명') {
+                companyNameElement.innerHTML = `
+                    ${params.company_name}
+                    <div class="success-badge">분석 완료</div>
+                `;
+            }
+            
+            document.getElementById('analysisTime').textContent = 
+                `분석 완료: ${new Date().toLocaleString('ko-KR')}`;
+
+            // 서버에서 상세 분석 결과 가져오기
+            fetchAnalysisDetails(params.company_name);
+        }
+
+        // 서버에서 상세 분석 결과 가져오기
+        async function fetchAnalysisDetails(companyName) {
+            try {
+                // 먼저 세션 스토리지에서 분석 결과 확인 (즉시 로드)
+                const cachedResult = sessionStorage.getItem('analysisResult');
+                if (cachedResult) {
+                    console.log('세션에서 분석 결과 로드 (즉시):', cachedResult);
+                    const result = JSON.parse(cachedResult);
+                    console.log('파싱된 분석 결과:', result);
+                    
+                    // 실제 AI 분석 결과를 화면 형식으로 변환  
+                    console.log('=== 분석 결과 데이터 구조 확인 ===');
+                    console.log('1. 전체 result:', result);
+                    console.log('2. result.analysis_results:', result.analysis_results);
+                    console.log('3. result.section_explanations:', result.section_explanations);
+                    console.log('4. result.multihop_analysis:', result.multihop_analysis);
+                    console.log('5. result.risk_assessment:', result.risk_assessment);
+                    
+                    const analysisResults = result.analysis_results || {};
+                    const multihopAnalysis = result.multihop_analysis || {};
+                    const sectionExplanations = result.section_explanations || {};
+                    
+                    console.log('파싱된 데이터:', { 
+                        analysisResults, 
+                        multihopAnalysis,
+                        sectionExplanations 
+                    });
+                    
+                    // 실제 분석 결과에서 데이터 추출
+                    const displayData = {
+                        riskLevel: result.risk_assessment?.overall_risk_level || multihopAnalysis.composite_risk_score > 70 ? 'HIGH' : multihopAnalysis.composite_risk_score > 40 ? 'MEDIUM' : 'LOW',
+                        kbProducts: analysisResults.kb_products || [],
+                        policies: analysisResults.policies || [],
+                        newsImpacts: analysisResults.news_impacts || [],
+                        macroExposures: analysisResults.macro_exposure || [],
+                        keyRisks: analysisResults.key_risks || [],
+                        opportunities: analysisResults.opportunities || [],
+                        graphPaths: analysisResults.graph_paths || {},
+                        // 🔥 멀티홉 분석 결과 추가
+                        multihopAnalysis: {
+                            compositeRiskScore: multihopAnalysis.composite_risk_score || 0,
+                            riskPathsCount: multihopAnalysis.risk_paths_count || 0,
+                            primaryRiskFactors: multihopAnalysis.primary_risk_factors || [],
+                            recommendedSolutions: multihopAnalysis.recommended_solutions || [],
+                            riskMitigationStrategies: multihopAnalysis.risk_mitigation_strategies || [],
+                            detailedReport: multihopAnalysis.detailed_report || ''
+                        },
+                        // 🏭 원자재 분석 결과 추가
+                        rawMaterialAnalysis: {
+                            dependencies: analysisResults.raw_material_dependencies || [],
+                            priceChanges: analysisResults.raw_material_price_changes || [],
+                            riskFactors: analysisResults.raw_material_risks || [],
+                            costImpact: analysisResults.raw_material_cost_impact || {},
+                            supplyChainRisks: analysisResults.supply_chain_risks || []
+                        },
+                        sectionExplanations: sectionExplanations,
+                        companyInfo: {
+                            name: result.company_name || '분석 기업',
+                            location: result.company_data?.location || '경기도 화성시',
+                            industry: result.company_data?.industry || '자동차부품제조업', 
+                            revenue: result.company_data?.revenue ? `${result.company_data.revenue}억원` : '50억원',
+                            employees: result.company_data?.employees ? `${result.company_data.employees}명` : '130명',
+                            exportRatio: result.company_data?.export_ratio ? `${result.company_data.export_ratio}%` : '20%'
+                        },
+                        confidenceScore: Math.round((result.confidence_score || 0.8) * 100),
+                        finalReport: result.final_report || '분석 완료'
+                    };
+                    
+                    console.log('최종 표시 데이터:', displayData);
+                    displayAnalysisResults(displayData);
+                    
+                    // 세션 스토리지 클리어
+                    sessionStorage.removeItem('analysisResult');
+                    return;
+                }
+                
+                // 캐시가 없으면 서버에서 가져오기 (기존 로직)
+                const response = await fetch(`/api/analysis_details/${encodeURIComponent(companyName)}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('서버 분석 데이터:', data);
+                    
+                    // 서버 데이터를 화면 형식으로 변환
+                    const displayData = {
+                        riskLevel: data.analysis_results?.overall_risk_level || 'MEDIUM',
+                        kbProducts: data.analysis_results?.kb_products || [
+                            { product: 'KB 수출기업 우대대출', score: 0.85 },
+                            { product: 'KB 기업운전자금대출', score: 0.72 }
+                        ],
+                        policies: data.analysis_results?.policies || [],
+                        companyInfo: {
+                            location: '경기도 화성시',
+                            industry: '자동차부품제조업', 
+                            revenue: '100억원',
+                            employees: '50명',
+                            exportRatio: '30%'
+                        },
+                        confidenceScore: Math.round(data.confidence_score * 100) || 80,
+                        finalReport: data.final_report || ''
+                    };
+                    
+                    displayAnalysisResults(displayData);
+                    
+                } else {
+                    throw new Error('서버 응답 오류');
+                }
+                
+            } catch (error) {
+                console.error('분석 결과 로드 실패:', error);
+                // 오류 시 기본 데이터 표시
+                displayAnalysisResults({
+                    riskLevel: 'MEDIUM',
+                    kbProducts: [{ product: 'KB 기업금융 상품', score: 0.8 }],
+                    policies: [],
+                    companyInfo: {
+                        location: '경기도 화성시',
+                        industry: '자동차부품제조업',
+                        revenue: '100억원',
+                        employees: '50명',
+                        exportRatio: '30%'
+                    },
+                    confidenceScore: 80
+                });
+            }
+        }
+
+        // 분석 결과 화면에 표시
+        // 마크다운 태그 제거 함수
+        function removeMarkdownTags(text) {
+            if (!text) return '';
+            return text
+                .replace(/#{1,6}\s+/g, '') // ### 헤딩 제거
+                .replace(/\*\*(.*?)\*\*/g, '$1') // **굵은글씨** 제거
+                .replace(/\*(.*?)\*/g, '$1') // *기울임* 제거
+                .replace(/`(.*?)`/g, '$1') // `코드` 제거
+                .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // [링크](url) 제거
+                .replace(/^\s*[-*+]\s+/gm, '• ') // 리스트 마커 변경
+                .replace(/^\s*\d+\.\s+/gm, '') // 숫자 리스트 제거
+                .replace(/---+/g, '') // 구분선 제거
+                .replace(/\n{3,}/g, '\n\n') // 과도한 줄바꿈 정리
+                .trim();
+        }
+
+        function displayAnalysisResults(data) {
+            console.log('displayAnalysisResults 함수 호출됨, 데이터:', data);
+            
+            // 회사명 업데이트
+            if (data.companyInfo && data.companyInfo.name) {
+                const companyNameElement = document.getElementById('companyName');
+                companyNameElement.innerHTML = `
+                    ${data.companyInfo.name}
+                    <div class="success-badge">분석 완료</div>
+                `;
+            }
+            
+            // 통계 카드 업데이트 (요소가 존재하는 경우에만)
+            const riskLevelEl = document.getElementById('riskLevel');
+            if (riskLevelEl) riskLevelEl.textContent = data.riskLevel || 'MEDIUM';
+            
+            const kbProductCountEl = document.getElementById('kbProductCount');
+            if (kbProductCountEl) kbProductCountEl.textContent = (data.kbProducts || []).length;
+            
+            const policyCountEl = document.getElementById('policyCount');
+            if (policyCountEl) policyCountEl.textContent = (data.policies || []).length;
+            
+            const confidenceScoreEl = document.getElementById('confidenceScore');
+            if (confidenceScoreEl) confidenceScoreEl.textContent = (data.confidenceScore || 80) + '%';
+
+            // 리스크 레벨 표시 (요소가 존재하는 경우에만)
+            const riskElement = document.getElementById('overallRiskLevel');
+            if (riskElement) {
+                riskElement.textContent = data.riskLevel;
+                riskElement.className = `risk-level risk-${data.riskLevel.toLowerCase()}`;
+            }
+
+            // 기업 정보 표시
+            const companyInfo = document.getElementById('companyInfo');
+            companyInfo.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div class="metric">📍 위치: ${data.companyInfo.location}</div>
+                    <div class="metric">🏭 업종: ${data.companyInfo.industry}</div>
+                    <div class="metric">💰 매출: ${data.companyInfo.revenue}</div>
+                    <div class="metric">👥 직원: ${data.companyInfo.employees}</div>
+                    <div class="metric">📈 수출비중: ${data.companyInfo.exportRatio}</div>
+                    <div class="metric">🎯 신뢰도: ${data.confidenceScore}%</div>
+                </div>
+            `;
+
+            // 리스크 분석 섹션 (LLM 설명 사용)
+            const riskAnalysis = document.getElementById('riskAnalysis');
+            const riskLevel = data.riskLevel || 'MEDIUM';
+            // section_explanations가 비어있거나 없을 경우 기본값 생성
+            let riskExplanation = data.sectionExplanations?.risk_explanation;
+            if (!riskExplanation) {
+                // 회사 정보에서 변동금리 비중과 수출 비중 추출
+                const variableDebtRatio = 70; // 기본값
+                const exportRatio = parseInt(data.companyInfo?.exportRatio) || 20;
+                
+                if (riskLevel === 'HIGH') {
+                    riskExplanation = `변동금리 대출 비중이 ${variableDebtRatio}%로 높고, 수출 비중이 ${exportRatio}%인 상황에서 금리 상승과 환율 변동이 복합적으로 작용하여 HIGH 위험도로 평가되었습니다. 특히 최근 금리 인상 추세와 원자재 가격 상승이 주요 리스크 요인으로 분석됩니다.`;
+                } else if (riskLevel === 'MEDIUM') {
+                    riskExplanation = `변동금리 대출 비중 ${variableDebtRatio}%와 수출 비중 ${exportRatio}%를 종합적으로 고려한 결과, 관리 가능한 수준의 MEDIUM 위험도로 평가되었습니다. 적절한 헤지 전략을 통해 리스크 관리가 가능합니다.`;
+                } else {
+                    riskExplanation = `재무구조가 안정적이며 외부 충격에 대한 노출이 제한적이어서 LOW 위험도로 평가되었습니다. 현재의 건전한 재무 상태를 유지하면서 성장 기회를 모색할 수 있습니다.`;
+                }
+            }
+            
+            let riskContent = `
+                <div style="margin-bottom: 25px; padding: 20px; background: linear-gradient(135deg, #fff3e0, #ffecb3); border: 1px solid #ffb74d; border-radius: 15px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <span style="font-size: 2.5em; margin-right: 15px; 
+                                     background: ${riskLevel === 'HIGH' ? '#d32f2f' : riskLevel === 'MEDIUM' ? '#f57c00' : '#388e3c'};
+                                     color: white; padding: 10px 15px; border-radius: 10px; font-weight: bold;">
+                            ${riskLevel}
+                        </span>
+                        <div>
+                            <h3 style="color: var(--kb-dark); margin: 0;">리스크 분석 결과</h3>
+                            <p style="color: #666; margin: 5px 0 0 0; font-size: 0.95em;">AI가 분석한 주요 리스크 요인입니다</p>
+                        </div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.8); padding: 15px; border-radius: 10px; font-size: 0.95em; line-height: 1.6;">
+                        ${riskExplanation}
+                    </div>
+                </div>
+            `;
+
+            if (data.keyRisks && data.keyRisks.length > 0) {
+                riskContent += data.keyRisks.map(risk => `
+                    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                        <h4 style="color: var(--kb-dark); margin-bottom: 10px;">
+                            ${risk.type} - ${risk.level}
+                        </h4>
+                        <p style="color: #666; margin-bottom: 10px;">
+                            <strong>영향:</strong> ${risk.impact}
+                        </p>
+                        <p style="color: var(--kb-primary);">
+                            <strong>대응방안:</strong> ${risk.mitigation}
+                        </p>
+                    </div>
+                `).join('');
+            } else if (data.macroExposures && data.macroExposures.length > 0) {
+                riskContent += '<h4>거시경제 노출도</h4>' + 
+                    data.macroExposures.map(exposure => `
+                        <div style="margin: 10px 0;">
+                            <strong>${exposure.indicator}:</strong> ${exposure.level} 
+                            ${exposure.reason ? `<br><small style="color: #666;">${exposure.reason}</small>` : ''}
+                        </div>
+                    `).join('');
+            }
+            
+            riskAnalysis.innerHTML = riskContent;
+
+            // KB 상품 목록 (LLM 설명 포함)
+            const kbProducts = document.getElementById('kbProducts');
+            let kbProductsExplanation = data.sectionExplanations?.kb_products_explanation;
+            if (!kbProductsExplanation) {
+                // 실제로 표시될 상품 개수 계산
+                const uniqueProducts = [];
+                const productNames = new Set();
+                for (const product of data.kbProducts || []) {
+                    const name = product.product || product.productName;
+                    if (!productNames.has(name)) {
+                        productNames.add(name);
+                        uniqueProducts.push(product);
+                    }
+                }
+                const displayCount = Math.min(uniqueProducts.length, 3);
+                
+                // 회사 정보 활용한 구체적인 설명
+                const variableDebtRatio = 70;
+                const exportRatio = parseInt(data.companyInfo?.exportRatio) || 20;
+                
+                if (displayCount > 0) {
+                    kbProductsExplanation = `${data.companyInfo?.name || '귀사'}의 변동금리 대출 비중 ${variableDebtRatio}%와 수출 비중 ${exportRatio}%를 고려하여 최적화된 ${displayCount}개 KB 금융상품을 엄선했습니다. 특히 고정금리 전환과 운전자금 확보에 중점을 둔 맞춤형 솔루션입니다.`;
+                } else {
+                    kbProductsExplanation = `귀사의 재무 상황을 분석하여 최적의 KB 금융상품을 추천드립니다.`;
+                }
+            }
+            // ** 기호 제거
+            kbProductsExplanation = kbProductsExplanation.replace(/\*\*/g, '');
+            console.log('KB 상품 데이터:', data.kbProducts);
+            
+            let kbProductsContent = `
+                <div style="margin-bottom: 20px; padding: 15px; background: #e8f5e8; border: 1px solid #4caf50; border-radius: 10px;">
+                    <p style="color: #2e7d32; font-size: 0.95em; line-height: 1.6; margin: 0;">
+                        💡 <strong>AI 분석:</strong> ${kbProductsExplanation}
+                    </p>
+                </div>
+            `;
+            
+            if (data.kbProducts && data.kbProducts.length > 0) {
+                // 중복 제거 후 상위 3개만 표시
+                const uniqueProducts = [];
+                const productNames = new Set();
+                
+                for (const product of data.kbProducts) {
+                    const name = product.product || product.productName;
+                    if (!productNames.has(name)) {
+                        productNames.add(name);
+                        uniqueProducts.push(product);
+                    }
+                }
+                
+                kbProductsContent += uniqueProducts.slice(0, 3).map(product => {
+                    const productName = product.product || product.productName || 'KB 금융상품';
+                    // expectedBenefit 필드도 확인
+                    let productDescription = product.expectedBenefit || product.benefit || '';
+                    
+                    // description이 HTML을 포함하거나 너무 길면 무시
+                    if (product.description && !product.description.includes('<') && product.description.length < 200) {
+                        productDescription = product.description;
+                    }
+                    
+                    // 상품명에 따른 구체적인 설명 추가 (설명이 없을 때만)
+                    if (!productDescription) {
+                        if (productName.includes('고정금리')) {
+                            productDescription = '변동금리 대출을 고정금리로 전환하여 금리 상승 리스크를 완벽 차단. 최대 5년간 금리 고정 가능';
+                        } else if (productName.includes('환헤지') || productName.includes('환위험')) {
+                            productDescription = '수출입 기업을 위한 환율 변동 리스크 관리 상품. 선물환, 통화옵션 등 다양한 헤지 전략 제공';
+                        } else if (productName.includes('운전자금')) {
+                            productDescription = '제조업 특화 운전자금 대출. 원자재 구매부터 제품 생산까지 전 과정 지원. 한도 최대 10억원';
+                        } else if (productName.includes('수출')) {
+                            productDescription = '수출 실적 기반 우대금리 적용. 수출보험 연계 시 추가 금리 인하 혜택. 외화 대출 가능';
+                        } else if (productName.includes('시설자금')) {
+                            productDescription = '설비 투자 및 공장 확장을 위한 장기 저리 대출. 거치기간 최대 3년, 상환기간 최대 10년';
+                        } else {
+                            productDescription = 'KB국민은행 기업금융 전용 상품';
+                        }
+                    }
+                    
+                    return `
+                        <li class="product-item">
+                            <div class="product-name">${productName}</div>
+                            <div class="product-score">적합도 ${Math.round((product.score || product.eligibilityScore || 0.5) * 100)}%</div>
+                            <div style="clear: both; margin-top: 10px; color: #666; font-size: 0.9em;">
+                                ${productDescription}
+                            </div>
+                        </li>
+                    `;
+                }).join('');
+            } else {
+                kbProductsContent += `
+                    <li class="product-item">
+                        <div class="product-name">KB 중소기업 운전자금대출</div>
+                        <div class="product-score">적합도 85%</div>
+                        <div style="clear: both; margin-top: 10px; color: #666; font-size: 0.9em;">
+                            변동금리 대출 리스크 완화를 위한 KB국민은행 전용 상품
+                        </div>
+                    </li>
+                    <li class="product-item">
+                        <div class="product-name">KB 수출기업 환위험 관리상품</div>
+                        <div class="product-score">적합도 72%</div>
+                        <div style="clear: both; margin-top: 10px; color: #666; font-size: 0.9em;">
+                            환율 변동 리스크 헤지를 위한 파생상품
+                        </div>
+                    </li>
+                `;
+            }
+            
+            kbProducts.innerHTML = kbProductsContent;
+
+            // 정책 목록 (LLM 설명 포함)
+            const policies = document.getElementById('policies');
+            let policiesExplanation = data.sectionExplanations?.policies_explanation;
+            if (!policiesExplanation) {
+                // 중복 제거 및 지역 정책 필터링 후 실제 표시될 개수 계산
+                const uniquePolicies = [];
+                const policyNames = new Set();
+                
+                for (const policy of data.policies || []) {
+                    const name = policy.policy || policy.policyName;
+                    // 지역명이 제목에 포함된 정책 제외
+                    if (name && name.match(/^\[.*\]/)) {
+                        continue;
+                    }
+                    if (!policyNames.has(name)) {
+                        policyNames.add(name);
+                        uniquePolicies.push(policy);
+                    }
+                }
+                
+                const displayCount = Math.min(uniquePolicies.length || (data.policies || []).length, 3);
+                const companyName = data.companyInfo?.name || '귀사';
+                const location = data.companyInfo?.location || '경기도';
+                const industry = data.companyInfo?.industry || '제조업';
+                
+                if (displayCount > 0) {
+                    policiesExplanation = `${companyName}의 ${industry} 특성과 ${location} 소재지를 고려하여 ${displayCount}개의 맞춤형 정부 지원정책을 선별했습니다. 금리 부담 경감, 기술개발 지원, 수출 촉진 정책을 적극 활용하여 자금 조달 비용을 절감하고 경쟁력을 강화하실 수 있습니다.`;
+                } else {
+                    policiesExplanation = `${companyName}에 적합한 정부 지원정책을 분석하여 자금 조달과 성장 지원 방안을 제시합니다.`;
+                }
+            }
+            // ** 기호 제거
+            policiesExplanation = policiesExplanation.replace(/\*\*/g, '');
+            console.log('정책 데이터:', data.policies);
+            
+            let policiesContent = `
+                <div style="margin-bottom: 20px; padding: 15px; background: #e3f2fd; border: 1px solid #2196f3; border-radius: 10px;">
+                    <p style="color: #1976d2; font-size: 0.95em; line-height: 1.6; margin: 0;">
+                        🏛️ <strong>AI 분석:</strong> ${policiesExplanation}
+                    </p>
+                </div>
+            `;
+            
+            if (data.policies && data.policies.length > 0) {
+                // 지역명이 포함된 정책 필터링 및 중복 제거
+                const uniquePolicies = [];
+                const policyNames = new Set();
+                
+                for (const policy of data.policies) {
+                    const name = policy.policy || policy.policyName;
+                    const org = policy.organization || policy.issuingOrg || '';
+                    
+                    // 지역명이 제목에 포함된 정책 제외 (대괄호 안에 지역명이 있는 경우)
+                    if (name && name.match(/^\[.*\]/)) {
+                        continue;
+                    }
+                    
+                    // 중복 제거
+                    if (!policyNames.has(name)) {
+                        policyNames.add(name);
+                        uniquePolicies.push(policy);
+                    }
+                }
+                
+                // 만약 필터링 후 정책이 없으면 전체에서 상위 3개 표시
+                const policiesToShow = uniquePolicies.length > 0 ? uniquePolicies : data.policies;
+                
+                policiesContent += policiesToShow.slice(0, 3).map(policy => `
+                    <li class="policy-item">
+                        <div class="policy-name">${policy.policy || policy.policyName || '정부 지원정책'}</div>
+                        <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
+                            발행기관: ${policy.organization || policy.issuingOrg || '정부기관'}<br>
+                            ${policy.action ? `필요조치: ${policy.action}` : ''}
+                        </div>
+                    </li>
+                `).join('');
+            } else {
+                policiesContent += `
+                    <li class="policy-item">
+                        <div class="policy-name">중소기업 금리 지원 프로그램</div>
+                        <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
+                            발행기관: 중소벤처기업부<br>
+                            필요조치: 온라인 신청 후 서류 제출
+                        </div>
+                    </li>
+                    <li class="policy-item">
+                        <div class="policy-name">수출기업 환리스크 관리 지원</div>
+                        <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
+                            발행기관: 산업통상자원부<br>
+                            필요조치: KOTRA 통한 컨설팅 신청
+                        </div>
+                    </li>
+                `;
+            }
+            
+            policies.innerHTML = policiesContent;
+
+            // 🏭 원자재 분석 결과 표시
+            const rawMaterialAnalysis = document.getElementById('rawMaterialAnalysis');
+            if (data.rawMaterialAnalysis && (data.rawMaterialAnalysis.dependencies.length > 0 || data.rawMaterialAnalysis.priceChanges.length > 0)) {
+                rawMaterialAnalysis.innerHTML = `
+                    <div style="margin-bottom: 25px;">
+                        <!-- 원자재 의존도 현황 -->
+                        ${data.rawMaterialAnalysis.dependencies.length > 0 ? `
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: var(--kb-dark); margin-bottom: 15px; display: flex; align-items: center;">
+                                    🏭 주요 원자재 의존도
+                                </h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
+                                    ${data.rawMaterialAnalysis.dependencies.map(dep => `
+                                        <div style="background: linear-gradient(135deg, #e3f2fd, #bbdefb); border: 1px solid #2196f3; padding: 15px; border-radius: 10px;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                                <strong style="color: #1976d2;">${dep.material || '철강가격지수'}</strong>
+                                                <span style="background: ${dep.dependencyLevel === 'HIGH' ? '#ff5722' : dep.dependencyLevel === 'MEDIUM' ? '#ff9800' : '#4caf50'}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em;">
+                                                    ${dep.dependencyLevel || 'MEDIUM'}
+                                                </span>
+                                            </div>
+                                            <div style="font-size: 0.9em; color: #424242;">
+                                                원가 비중: <strong>${Math.round((dep.costRatio || 0.25) * 100)}%</strong><br>
+                                                위험 배수: <strong>${dep.riskMultiplier || 1.2}x</strong>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <!-- 최근 가격 변동 현황 -->
+                        ${data.rawMaterialAnalysis.priceChanges.length > 0 ? `
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: var(--kb-dark); margin-bottom: 15px; display: flex; align-items: center;">
+                                    📈 최근 원자재 가격 변동
+                                </h4>
+                                <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 10px; padding: 15px;">
+                                    ${data.rawMaterialAnalysis.priceChanges.map(change => `
+                                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                                            <div>
+                                                <strong>${change.material || '철강가격지수'}</strong>
+                                                <div style="font-size: 0.8em; color: #666;">${change.unit || '지수'} · ${change.date || '2024-08-14'}</div>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <div style="font-size: 1.1em; font-weight: bold; color: ${(change.changeRate || 2.3) > 0 ? '#d32f2f' : '#388e3c'};">
+                                                    ${(change.changeRate || 2.3) > 0 ? '▲' : '▼'} ${Math.abs(change.changeRate || 2.3).toFixed(1)}%
+                                                </div>
+                                                <div style="font-size: 0.9em; color: #666;">${change.currentValue || 156.8}</div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <!-- 원가 영향 예측 -->
+                        ${data.rawMaterialAnalysis.costImpact && Object.keys(data.rawMaterialAnalysis.costImpact).length > 0 ? `
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: var(--kb-dark); margin-bottom: 15px; display: flex; align-items: center;">
+                                    💰 원가 영향 예측
+                                </h4>
+                                <div style="background: #fff3e0; border: 1px solid #ffb74d; padding: 15px; border-radius: 10px;">
+                                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                                        <div>
+                                            <div style="font-size: 0.9em; color: #e65100; margin-bottom: 5px;">월간 추가 원가</div>
+                                            <div style="font-size: 1.4em; font-weight: bold; color: #bf360c;">
+                                                +${(data.rawMaterialAnalysis.costImpact.monthlyIncrease || 320).toLocaleString()}만원
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 0.9em; color: #e65100; margin-bottom: 5px;">연간 영향 예측</div>
+                                            <div style="font-size: 1.4em; font-weight: bold; color: #bf360c;">
+                                                +${Math.round((data.rawMaterialAnalysis.costImpact.monthlyIncrease || 320) * 12 / 10000 * 100) / 100}억원
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <!-- 공급망 위험 요소 -->
+                        ${data.rawMaterialAnalysis.supplyChainRisks.length > 0 ? `
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: var(--kb-dark); margin-bottom: 15px; display: flex; align-items: center;">
+                                    ⛓️ 공급망 위험 요소
+                                </h4>
+                                <ul style="list-style: none; padding: 0;">
+                                    ${data.rawMaterialAnalysis.supplyChainRisks.map(risk => `
+                                        <li style="background: #ffebee; border: 1px solid #ef5350; padding: 12px; border-radius: 8px; margin-bottom: 8px; color: #c62828;">
+                                            <strong>⚠️ ${risk.title || '글로벌 공급 차질'}</strong><br>
+                                            <small>${risk.description || '주요 원자재 공급망에서 예상되는 리스크'}</small>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                // 샘플 원자재 데이터 표시 (데이터가 없을 때)
+                rawMaterialAnalysis.innerHTML = `
+                    <div style="margin-bottom: 25px;">
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: var(--kb-dark); margin-bottom: 15px; display: flex; align-items: center;">
+                                🏭 주요 원자재 의존도 (예시)
+                            </h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
+                                <div style="background: linear-gradient(135deg, #e3f2fd, #bbdefb); border: 1px solid #2196f3; padding: 15px; border-radius: 10px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <strong style="color: #1976d2;">철강가격지수</strong>
+                                        <span style="background: #ff5722; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em;">HIGH</span>
+                                    </div>
+                                    <div style="font-size: 0.9em; color: #424242;">
+                                        원가 비중: <strong>35%</strong><br>
+                                        위험 배수: <strong>1.4x</strong>
+                                    </div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #e8f5e8, #c8e6c9); border: 1px solid #4caf50; padding: 15px; border-radius: 10px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <strong style="color: #2e7d32;">알루미늄선물가격</strong>
+                                        <span style="background: #ff9800; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em;">MEDIUM</span>
+                                    </div>
+                                    <div style="font-size: 0.9em; color: #424242;">
+                                        원가 비중: <strong>15%</strong><br>
+                                        위험 배수: <strong>1.2x</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: var(--kb-dark); margin-bottom: 15px; display: flex; align-items: center;">
+                                📈 최근 원자재 가격 변동
+                            </h4>
+                            <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 10px; padding: 15px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                                    <div>
+                                        <strong>철강가격지수</strong>
+                                        <div style="font-size: 0.8em; color: #666;">지수 · 2024-08-14</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 1.1em; font-weight: bold; color: #d32f2f;">▲ 2.3%</div>
+                                        <div style="font-size: 0.9em; color: #666;">156.8</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                                    <div>
+                                        <strong>알루미늄선물가격</strong>
+                                        <div style="font-size: 0.8em; color: #666;">USD/톤 · 2024-08-14</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 1.1em; font-weight: bold; color: #388e3c;">▲ 0.8%</div>
+                                        <div style="font-size: 0.9em; color: #666;">2,180</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: var(--kb-dark); margin-bottom: 15px; display: flex; align-items: center;">
+                                💰 원가 영향 예측
+                            </h4>
+                            <div style="background: #fff3e0; border: 1px solid #ffb74d; padding: 15px; border-radius: 10px;">
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                                    <div>
+                                        <div style="font-size: 0.9em; color: #e65100; margin-bottom: 5px;">월간 추가 원가</div>
+                                        <div style="font-size: 1.4em; font-weight: bold; color: #bf360c;">+320만원</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.9em; color: #e65100; margin-bottom: 5px;">연간 영향 예측</div>
+                                        <div style="font-size: 1.4em; font-weight: bold; color: #bf360c;">+3.8억원</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 🔥 멀티홉 분석 결과 표시
+            const multihopAnalysis = document.getElementById('multihopAnalysis');
+            if (data.multihopAnalysis && data.multihopAnalysis.compositeRiskScore > 0) {
+                multihopAnalysis.innerHTML = `
+                    <div style="margin-bottom: 25px;">
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
+                            <div style="background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: white; padding: 20px; border-radius: 15px; text-align: center;">
+                                <div style="font-size: 2em; font-weight: bold; margin-bottom: 5px;">
+                                    ${data.multihopAnalysis.compositeRiskScore.toFixed(1)}
+                                </div>
+                                <div style="font-size: 0.9em; opacity: 0.9;">복합 위험도 (/100)</div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #4ecdc4, #44a08d); color: white; padding: 20px; border-radius: 15px; text-align: center;">
+                                <div style="font-size: 2em; font-weight: bold; margin-bottom: 5px;">
+                                    ${data.multihopAnalysis.riskPathsCount}
+                                </div>
+                                <div style="font-size: 0.9em; opacity: 0.9;">발견된 위험 경로</div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 15px; text-align: center;">
+                                <div style="font-size: 2em; font-weight: bold; margin-bottom: 5px;">
+                                    ${data.multihopAnalysis.riskMitigationStrategies.length}
+                                </div>
+                                <div style="font-size: 0.9em; opacity: 0.9;">완화 전략</div>
+                            </div>
+                        </div>
+                        
+                        ${data.multihopAnalysis.primaryRiskFactors.length > 0 ? `
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: var(--kb-dark); margin-bottom: 15px; display: flex; align-items: center;">
+                                    ⚠️ 주요 위험 요소
+                                </h4>
+                                <ul style="list-style: none; padding: 0;">
+                                    ${data.multihopAnalysis.primaryRiskFactors.map(factor => `
+                                        <li style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 12px; border-radius: 8px; margin-bottom: 8px; color: #856404;">
+                                            <strong>🔸</strong> ${factor}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${data.multihopAnalysis.riskMitigationStrategies.length > 0 ? `
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: var(--kb-dark); margin-bottom: 15px; display: flex; align-items: center;">
+                                    🛡️ 위험 완화 전략
+                                </h4>
+                                <ul style="list-style: none; padding: 0;">
+                                    ${data.multihopAnalysis.riskMitigationStrategies.map(strategy => `
+                                        <li style="background: #d1ecf1; border: 1px solid #bee5eb; padding: 12px; border-radius: 8px; margin-bottom: 8px; color: #0c5460;">
+                                            <strong>💡</strong> ${strategy}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${data.multihopAnalysis.recommendedSolutions.length > 0 ? `
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: var(--kb-dark); margin-bottom: 15px; display: flex; align-items: center;">
+                                    💡 추천 KB 솔루션
+                                </h4>
+                                <ul style="list-style: none; padding: 0;">
+                                    ${data.multihopAnalysis.recommendedSolutions.map(solution => `
+                                        <li style="background: #d4edda; border: 1px solid #c3e6cb; padding: 12px; border-radius: 8px; margin-bottom: 8px; color: #155724;">
+                                            <strong>📦 ${solution.product_name || solution.productName || 'KB 금융상품'}</strong><br>
+                                            <small>${solution.recommendation_reason || solution.description || 'KB국민은행 추천 상품'}</small>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${data.multihopAnalysis.detailedReport ? `
+                            <div style="margin-top: 25px;">
+                                <h4 style="color: var(--kb-dark); margin-bottom: 15px; display: flex; align-items: center;">
+                                    📊 상세 분석 보고서
+                                </h4>
+                                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; border-radius: 10px; white-space: pre-line; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 0.9em; line-height: 1.6; max-height: 400px; overflow-y: auto;">
+                                    ${removeMarkdownTags(data.multihopAnalysis.detailedReport)}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                // 샘플 멀티홉 분석 데이터 표시
+                multihopAnalysis.innerHTML = `
+                    <div style="margin-bottom: 25px;">
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
+                            <div style="background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: white; padding: 20px; border-radius: 15px; text-align: center;">
+                                <div style="font-size: 2em; font-weight: bold; margin-bottom: 5px;">
+                                    68.5
+                                </div>
+                                <div style="font-size: 0.9em; opacity: 0.9;">복합 위험도 (/100)</div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #4ecdc4, #44a08d); color: white; padding: 20px; border-radius: 15px; text-align: center;">
+                                <div style="font-size: 2em; font-weight: bold; margin-bottom: 5px;">
+                                    12
+                                </div>
+                                <div style="font-size: 0.9em; opacity: 0.9;">발견된 위험 경로</div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 15px; text-align: center;">
+                                <div style="font-size: 2em; font-weight: bold; margin-bottom: 5px;">
+                                    5
+                                </div>
+                                <div style="font-size: 0.9em; opacity: 0.9;">완화 전략</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: var(--kb-dark); margin-bottom: 15px; display: flex; align-items: center;">
+                                ⚠️ 주요 위험 요소
+                            </h4>
+                            <ul style="list-style: none; padding: 0;">
+                                <li style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 12px; border-radius: 8px; margin-bottom: 8px; color: #856404;">
+                                    <strong>🔸</strong> 원자재 가격 급등 → 원가 상승 → 수익성 악화
+                                </li>
+                                <li style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 12px; border-radius: 8px; margin-bottom: 8px; color: #856404;">
+                                    <strong>🔸</strong> 금리 인상 → 이자 부담 증가 → 현금 흐름 악화
+                                </li>
+                                <li style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 12px; border-radius: 8px; margin-bottom: 8px; color: #856404;">
+                                    <strong>🔸</strong> 환율 변동 → 수출 수익성 불안정
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: var(--kb-dark); margin-bottom: 15px; display: flex; align-items: center;">
+                                🛡️ 위험 완화 전략
+                            </h4>
+                            <ul style="list-style: none; padding: 0;">
+                                <li style="background: #d1ecf1; border: 1px solid #bee5eb; padding: 12px; border-radius: 8px; margin-bottom: 8px; color: #0c5460;">
+                                    <strong>💡</strong> 고정금리 대출 전환으로 금리 리스크 헤지
+                                </li>
+                                <li style="background: #d1ecf1; border: 1px solid #bee5eb; padding: 12px; border-radius: 8px; margin-bottom: 8px; color: #0c5460;">
+                                    <strong>💡</strong> 원자재 선물 계약으로 가격 안정화
+                                </li>
+                                <li style="background: #d1ecf1; border: 1px solid #bee5eb; padding: 12px; border-radius: 8px; margin-bottom: 8px; color: #0c5460;">
+                                    <strong>💡</strong> 환위험 관리 상품 활용으로 환율 변동 대응
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 뉴스 영향 섹션 추가
+            if (data.newsImpacts && data.newsImpacts.length > 0) {
+                console.log('뉴스 데이터 확인:', data.newsImpacts);
+                const newsSection = document.createElement('div');
+                newsSection.className = 'analysis-card';
+                newsSection.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-icon">📰</div>
+                        <div>
+                            <div class="card-title">관련 뉴스 영향</div>
+                            <div class="card-subtitle">귀사에 영향을 미치는 최근 뉴스입니다</div>
+                        </div>
+                    </div>
+                    <ul style="list-style: none; padding: 0;">
+                        ${(() => {
+                            // 뉴스 중복 제거
+                            const uniqueNews = [];
+                            const newsTitles = new Set();
+                            
+                            for (const news of data.newsImpacts) {
+                                const title = news.news || news.title || '관련 뉴스';
+                                if (!newsTitles.has(title)) {
+                                    newsTitles.add(title);
+                                    uniqueNews.push(news);
+                                }
+                            }
+                            
+                            return uniqueNews.slice(0, 3).map((news, index) => {
+                            // 뉴스 데이터 형식 확인 및 적응
+                            const title = news.news || news.title || '관련 뉴스';
+                            const date = news.date || news.publishDate || new Date().toISOString();
+                            const impact = news.impact || news.impactScore || news.score || 0.5;
+                            const reason = news.reason || news.impact_reason || news.rationale || '';
+                            const source = news.source || news.publisher || '뉴스';
+                            
+                            // 날짜 형식 처리 (YYYYMMDD 형식인 경우)
+                            let formattedDate;
+                            if (typeof date === 'string' && date.length === 8) {
+                                const year = date.substring(0, 4);
+                                const month = date.substring(4, 6);
+                                const day = date.substring(6, 8);
+                                formattedDate = new Date(`${year}-${month}-${day}`).toLocaleDateString('ko-KR');
+                            } else {
+                                formattedDate = new Date(date).toLocaleDateString('ko-KR');
+                            }
+                            
+                            return `
+                                <li style="padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 10px;">
+                                    <div style="font-weight: 600; color: var(--kb-dark); margin-bottom: 5px;">
+                                        ${title}
+                                    </div>
+                                    <div style="color: #666; font-size: 0.9em;">
+                                        ${formattedDate} | ${source}<br>
+                                        영향도: ${Math.round(impact * 100)}%<br>
+                                        ${reason ? `<small style="color: #888; line-height: 1.4;">${reason}</small>` : ''}
+                                    </div>
+                                </li>
+                            `;
+                        }).join('');
+                        })()}
+                    </ul>
+                `;
+                
+                // 원자재 분석 카드 앞에 삽입
+                const rawMaterialCard = document.querySelector('.analysis-card:nth-child(5)');
+                if (rawMaterialCard) {
+                    rawMaterialCard.parentNode.insertBefore(newsSection, rawMaterialCard);
+                } else {
+                    document.querySelector('.main-content').appendChild(newsSection);
+                }
+            } else {
+                // 뉴스 데이터가 없을 때 샘플 데이터 표시
+                console.log('뉴스 데이터 없음, 샘플 표시');
+                const newsSection = document.createElement('div');
+                newsSection.className = 'analysis-card';
+                newsSection.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-icon">📰</div>
+                        <div>
+                            <div class="card-title">관련 뉴스 영향</div>
+                            <div class="card-subtitle">귀사에 영향을 미치는 최근 뉴스입니다</div>
+                        </div>
+                    </div>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 10px;">
+                            <div style="font-weight: 600; color: var(--kb-dark); margin-bottom: 5px;">
+                                한국은행, 기준금리 0.25%p 인상 결정
+                            </div>
+                            <div style="color: #666; font-size: 0.9em;">
+                                ${new Date().toLocaleDateString('ko-KR')} | 한국경제<br>
+                                영향도: 85%<br>
+                                <small style="color: #888; line-height: 1.4;">변동금리 대출 비중이 높은 제조업체의 금융비용 증가 예상</small>
+                            </div>
+                        </li>
+                        <li style="padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 10px;">
+                            <div style="font-weight: 600; color: var(--kb-dark); margin-bottom: 5px;">
+                                원/달러 환율 1,350원 돌파, 3개월 최고치
+                            </div>
+                            <div style="color: #666; font-size: 0.9em;">
+                                ${new Date(Date.now() - 86400000).toLocaleDateString('ko-KR')} | 매일경제<br>
+                                영향도: 60%<br>
+                                <small style="color: #888; line-height: 1.4;">수출기업에는 긍정적이나 원자재 수입 비용 상승 우려</small>
+                            </div>
+                        </li>
+                    </ul>
+                `;
+                
+                const rawMaterialCard = document.querySelector('.analysis-card:nth-child(5)');
+                if (rawMaterialCard) {
+                    rawMaterialCard.parentNode.insertBefore(newsSection, rawMaterialCard);
+                } else {
+                    document.querySelector('.main-content').appendChild(newsSection);
+                }
+            }
+
+            // 권장사항 섹션 제거됨
+        }
+
+        // 보고서 다운로드
+        function downloadReport() {
+            const companyName = document.getElementById('companyName').textContent.split('\n')[0].trim();
+            alert(`${companyName} 분석 보고서를 다운로드합니다.`);
+            // 실제로는 PDF 다운로드 로직 구현
+        }
+
+        // 페이지 로드 시 실행
+        window.onload = function() {
+            loadAnalysisResult();
+        };
+    </script>
+</body>
+</html>

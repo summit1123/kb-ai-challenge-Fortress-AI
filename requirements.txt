@@ -1,0 +1,49 @@
+# Core dependencies
+python-dotenv==1.0.0
+requests==2.31.0
+
+# Neo4j
+neo4j==5.15.0
+py2neo==2021.2.4
+
+# LangChain ecosystem
+langchain==0.1.0
+langchain-community==0.1.0
+langchain-openai==0.0.5
+langchain-google-genai==0.0.6
+langgraph==0.0.28
+langchain-experimental==0.0.47
+
+# Vector stores
+faiss-cpu==1.7.4
+chromadb==0.4.22
+
+# UI
+chainlit==1.0.0
+flask==2.3.3
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+
+# Data processing
+pandas==2.1.4
+numpy==1.26.2
+pydantic==2.5.3
+PyYAML==6.0.1
+
+# API clients
+openai==1.6.1
+google-generativeai==0.3.2
+
+# Utilities
+aiohttp==3.9.1
+beautifulsoup4==4.12.2
+lxml==4.9.4
+tqdm==4.66.1
+
+# Development tools
+jupyter==1.0.0
+ipykernel==6.27.1
+black==23.12.1
+pylint==3.0.3
+pytest==7.4.3

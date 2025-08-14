@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KB Fortress AI - 슬라이더 테스트</title>
+    <style>
+        :root {
+            --kb-primary: #FFCC00;
+            --kb-secondary: #785C00;
+            --kb-dark: #1A1A1A;
+            --kb-gray: #666666;
+            --kb-light-gray: #F5F5F5;
+            --kb-success: #00C896;
+            --kb-warning: #FF6B35;
+            --kb-danger: #FF3366;
+            --kb-info: #3366FF;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 50px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 204, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--kb-primary);
+            margin-bottom: 40px;
+            font-size: 2.5em;
+        }
+
+        .range-container {
+            margin: 40px 0;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+        }
+
+        .range-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .range-header label {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--kb-primary);
+        }
+
+        .range-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: white;
+            background: var(--kb-primary);
+            color: var(--kb-dark);
+            padding: 8px 20px;
+            border-radius: 25px;
+            box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+        }
+
+        .range-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            margin: 15px 0;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--kb-primary);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 204, 0, 0.4);
+        }
+
+        .range-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--kb-primary);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 12px rgba(255, 204, 0, 0.4);
+        }
+
+        .range-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 10px;
+        }
+
+        .risk-indicators {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .risk-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 204, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .risk-card .risk-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .risk-card .risk-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--kb-primary);
+            margin-bottom: 10px;
+        }
+
+        .risk-status {
+            font-weight: bold;
+            font-size: 1.2em;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .debug-section {
+            background: rgba(0, 200, 150, 0.1);
+            border: 1px solid rgba(0, 200, 150, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .debug-section h3 {
+            color: var(--kb-success);
+            margin-bottom: 15px;
+        }
+
+        .debug-log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #00ff00;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .test-button {
+            background: var(--kb-primary);
+            color: var(--kb-dark);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+            box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 204, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎛️ KB Fortress AI 슬라이더 테스트</h1>
+        
+        <div class="debug-section">
+            <h3>🔍 디버그 정보</h3>
+            <div class="debug-log" id="debugLog">
+                페이지 로딩 중...<br>
+            </div>
+            <button class="test-button" onclick="manualTest()">🧪 수동 테스트</button>
+            <button class="test-button" onclick="clearLog()">🧹 로그 클리어</button>
+        </div>
+        
+        <div class="range-container">
+            <div class="range-header">
+                <label>변동금리 대출 비중</label>
+                <div class="range-value" id="variable_debt_display">70%</div>
+            </div>
+            <input type="range" class="range-slider" id="variable_debt_ratio" 
+                   min="0" max="100" value="70">
+            <div class="range-info">
+                <span>0% (안정)</span>
+                <span>100% (고위험)</span>
+            </div>
+        </div>
+
+        <div class="range-container">
+            <div class="range-header">
+                <label>수출 비중</label>
+                <div class="range-value" id="export_display">20%</div>
+            </div>
+            <input type="range" class="range-slider" id="export_ratio" 
+                   min="0" max="100" value="20">
+            <div class="range-info">
+                <span>내수 중심</span>
+                <span>수출 중심</span>
+            </div>
+        </div>
+
+        <!-- 실시간 리스크 인디케이터 -->
+        <div class="risk-indicators">
+            <div class="risk-card">
+                <div class="risk-icon">📊</div>
+                <div class="risk-title">금리 리스크</div>
+                <div class="risk-status" id="interest-risk">분석 대기</div>
+            </div>
+            <div class="risk-card">
+                <div class="risk-icon">💱</div>
+                <div class="risk-title">환율 리스크</div>
+                <div class="risk-status" id="exchange-risk">분석 대기</div>
+            </div>
+            <div class="risk-card">
+                <div class="risk-icon">📈</div>
+                <div class="risk-title">총 리스크</div>
+                <div class="risk-status" id="total-risk">분석 대기</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 디버그 로그 함수
+        function debugLog(message) {
+            const logElement = document.getElementById('debugLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}<br>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(`[DEBUG] ${message}`);
+        }
+
+        function clearLog() {
+            document.getElementById('debugLog').innerHTML = '로그 클리어됨<br>';
+        }
+
+        // 전역 변수 선언
+        let variableDebtSlider, variableDebtDisplay, exportSlider, exportDisplay;
+        
+        // DOM 로드 완료 후 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('DOM 로드 완료, 초기화 시작');
+            
+            // 슬라이더 요소 가져오기
+            variableDebtSlider = document.getElementById('variable_debt_ratio');
+            variableDebtDisplay = document.getElementById('variable_debt_display');
+            exportSlider = document.getElementById('export_ratio');
+            exportDisplay = document.getElementById('export_display');
+            
+            debugLog(`슬라이더 요소 확인: 변동금리=${!!variableDebtSlider}, 수출=${!!exportSlider}`);
+            debugLog(`디스플레이 요소 확인: 변동금리=${!!variableDebtDisplay}, 수출=${!!exportDisplay}`);
+            
+            // 변동금리 슬라이더 이벤트 리스너
+            if (variableDebtSlider && variableDebtDisplay) {
+                variableDebtSlider.addEventListener('input', function(e) {
+                    const value = e.target.value;
+                    debugLog(`✅ 변동금리 슬라이더 변경: ${value}%`);
+                    variableDebtDisplay.textContent = value + '%';
+                    updateRiskIndicators();
+                });
+                debugLog('✅ 변동금리 슬라이더 이벤트 리스너 등록 완료');
+            } else {
+                debugLog('❌ 변동금리 슬라이더 요소를 찾을 수 없음');
+            }
+            
+            // 수출비중 슬라이더 이벤트 리스너
+            if (exportSlider && exportDisplay) {
+                exportSlider.addEventListener('input', function(e) {
+                    const value = e.target.value;
+                    debugLog(`✅ 수출비중 슬라이더 변경: ${value}%`);
+                    exportDisplay.textContent = value + '%';
+                    updateRiskIndicators();
+                });
+                debugLog('✅ 수출비중 슬라이더 이벤트 리스너 등록 완료');
+            } else {
+                debugLog('❌ 수출비중 슬라이더 요소를 찾을 수 없음');
+            }
+            
+            // 초기 상태 설정
+            updateRiskIndicators();
+            debugLog('🎉 모든 초기화 완료! 슬라이더를 드래그해보세요!');
+        });
+        
+        // 리스크 인디케이터 업데이트
+        function updateRiskIndicators() {
+            if (!variableDebtSlider || !exportSlider) {
+                debugLog('슬라이더 요소가 없어서 리스크 업데이트 건너뜀');
+                return;
+            }
+            
+            const variableDebt = parseInt(variableDebtSlider.value);
+            const exportRatio = parseInt(exportSlider.value);
+            
+            debugLog(`리스크 인디케이터 업데이트: 변동금리=${variableDebt}%, 수출=${exportRatio}%`);
+            
+            // 금리 리스크
+            const interestRisk = document.getElementById('interest-risk');
+            if (interestRisk) {
+                if (variableDebt > 70) {
+                    interestRisk.textContent = '높음';
+                    interestRisk.style.color = '#FF3366';
+                } else if (variableDebt > 40) {
+                    interestRisk.textContent = '중간';
+                    interestRisk.style.color = '#FF6B35';
+                } else {
+                    interestRisk.textContent = '낮음';
+                    interestRisk.style.color = '#00C896';
+                }
+            }
+            
+            // 환율 리스크
+            const exchangeRisk = document.getElementById('exchange-risk');
+            if (exchangeRisk) {
+                if (exportRatio > 60) {
+                    exchangeRisk.textContent = '높음';
+                    exchangeRisk.style.color = '#FF3366';
+                } else if (exportRatio > 30) {
+                    exchangeRisk.textContent = '중간';
+                    exchangeRisk.style.color = '#FF6B35';
+                } else {
+                    exchangeRisk.textContent = '낮음';
+                    exchangeRisk.style.color = '#00C896';
+                }
+            }
+
+            // 총 리스크
+            const totalRisk = document.getElementById('total-risk');
+            if (totalRisk) {
+                const avgRisk = (variableDebt + exportRatio) / 2;
+                if (avgRisk > 60) {
+                    totalRisk.textContent = '주의 필요';
+                    totalRisk.style.color = '#FF3366';
+                } else if (avgRisk > 40) {
+                    totalRisk.textContent = '모니터링';
+                    totalRisk.style.color = '#FF6B35';
+                } else {
+                    totalRisk.textContent = '양호';
+                    totalRisk.style.color = '#00C896';
+                }
+            }
+        }
+
+        // 수동 테스트 함수
+        function manualTest() {
+            debugLog('🧪 수동 테스트 시작');
+            
+            if (variableDebtSlider) {
+                variableDebtSlider.value = Math.floor(Math.random() * 100);
+                debugLog(`변동금리 슬라이더 값을 ${variableDebtSlider.value}%로 변경`);
+                if (variableDebtDisplay) {
+                    variableDebtDisplay.textContent = variableDebtSlider.value + '%';
+                }
+            }
+            
+            if (exportSlider) {
+                exportSlider.value = Math.floor(Math.random() * 100);
+                debugLog(`수출비중 슬라이더 값을 ${exportSlider.value}%로 변경`);
+                if (exportDisplay) {
+                    exportDisplay.textContent = exportSlider.value + '%';
+                }
+            }
+            
+            updateRiskIndicators();
+            debugLog('🧪 수동 테스트 완료');
+        }
+    </script>
+</body>
+</html>
